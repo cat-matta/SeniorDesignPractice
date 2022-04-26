@@ -96,7 +96,7 @@ class _MyHomePageState extends State<MyHomePage> {
                 onPressed: _toggleTheme,
               ),
         title: const Text(
-          "Personal Expenses",
+          "Budget Better",
           // style: TextStyle(fontFamily: "OpenSans", fontWeight: FontWeight.bold),
         ),
         // foregroundColor: Theme.of(context).accentColor,
