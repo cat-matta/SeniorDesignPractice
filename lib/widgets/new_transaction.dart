@@ -1,5 +1,9 @@
+import 'dart:io';
+
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
+import 'package:udemy/widgets/adaptive_btn.dart';
 // import './user_transactions.dart';
 
 class NewTransaction extends StatefulWidget {
@@ -51,95 +55,93 @@ class _NewTransactionState extends State<NewTransaction> {
 
   @override
   Widget build(BuildContext context) {
-    return Card(
-      elevation: 5,
-      child: Container(
-        padding: const EdgeInsets.all(10),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.end,
-          children: [
-            TextField(
-              controller: _titleController,
-              // onChanged: ((value) {
-              //   titleInput = value;
-              // }),
-              decoration: const InputDecoration(
-                labelText: "Title",
+    return SingleChildScrollView(
+      child: Card(
+        elevation: 5,
+        child: Container(
+          padding: EdgeInsets.only(
+              top: 10,
+              left: 10,
+              right: 10,
+              bottom: MediaQuery.of(context).viewInsets.bottom + 10),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.end,
+            children: [
+              TextField(
+                controller: _titleController,
+                // onChanged: ((value) {
+                //   titleInput = value;
+                // }),
+                decoration: const InputDecoration(
+                  labelText: "Title",
+                ),
               ),
-            ),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceAround,
-              children: [
-                SizedBox(
-                  // color: Colors.blue,
-                  width: 120,
-                  child: TextField(
-                    controller: _amountController,
-                    keyboardType:
-                        const TextInputType.numberWithOptions(decimal: true),
-                    // onChanged: (value) => amountInput = value,
-                    decoration: const InputDecoration(
-                      labelText: "Amount",
-                    ),
-                    onSubmitted: (_) => _submitTransaction(),
-                  ),
-                ),
-                Container(
-                  width: 120,
-                  // color: Colors.amber,
-                  child: TextField(
-                    controller: _categoryController,
-                    // onChanged: ((value) {
-                    //   titleInput = value;
-                    // }),
-                    onSubmitted: (_) => _submitTransaction(),
-                    decoration: const InputDecoration(
-                      labelText: "Category",
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceAround,
+                children: [
+                  SizedBox(
+                    // color: Colors.blue,
+                    width: 120,
+                    child: TextField(
+                      controller: _amountController,
+                      keyboardType:
+                          const TextInputType.numberWithOptions(decimal: true),
+                      // onChanged: (value) => amountInput = value,
+                      decoration: const InputDecoration(
+                        labelText: "Amount",
+                      ),
+                      onSubmitted: (_) => _submitTransaction(),
                     ),
                   ),
-                ),
-              ],
-            ),
-            // SizedBox(
-            //   height: 12,
-            // ),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceAround,
-              children: [
-                Expanded(
-                  child: Text(_selectedDate == null
-                      ? "No date chosen!"
-                      : "Picked date: " +
-                          DateFormat.yMd().format(_selectedDate!).toString()),
-                ),
-                TextButton(
-                  style: ButtonStyle(
-                      foregroundColor: MaterialStateProperty.all(
-                          Theme.of(context).accentColor)),
-                  onPressed: _presentDatePicker,
-                  child: Text(
-                    "Choose Date",
-                    style: TextStyle(fontWeight: FontWeight.bold),
+                  Container(
+                    width: 120,
+                    // color: Colors.amber,
+                    child: TextField(
+                      controller: _categoryController,
+                      // onChanged: ((value) {
+                      //   titleInput = value;
+                      // }),
+                      onSubmitted: (_) => _submitTransaction(),
+                      decoration: const InputDecoration(
+                        labelText: "Category",
+                      ),
+                    ),
                   ),
-                ),
-              ],
-            ),
-            SizedBox(height: 12),
-            Container(
-              // color: Colors.tealAccent,
-              alignment: Alignment.center,
-              child: ElevatedButton(
-                  child: Text(
-                    "Add Transaction",
-                    style: TextStyle(color: ThemeData.dark().primaryColorDark),
+                ],
+              ),
+              // SizedBox(
+              //   height: 12,
+              // ),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceAround,
+                children: [
+                  Expanded(
+                    child: Text(_selectedDate == null
+                        ? "No date chosen!"
+                        : "Picked date: " +
+                            DateFormat.yMd().format(_selectedDate!).toString()),
                   ),
-                  onPressed: _submitTransaction,
-                  style: ButtonStyle(
-                      backgroundColor: MaterialStateProperty.all(
-                          ThemeData.dark().accentColor))),
-            ),
-          ],
-          mainAxisAlignment: MainAxisAlignment.spaceAround,
+                  AdaptiveFltBtn(_presentDatePicker)
+                ],
+              ),
+              SizedBox(height: 12),
+              Container(
+                // color: Colors.tealAccent,
+                alignment: Alignment.center,
+                child: ElevatedButton(
+                    child: Text(
+                      "Add Transaction",
+                      style:
+                          TextStyle(color: ThemeData.dark().primaryColorDark),
+                    ),
+                    onPressed: _submitTransaction,
+                    style: ButtonStyle(
+                        backgroundColor: MaterialStateProperty.all(
+                            ThemeData.dark().accentColor))),
+              ),
+            ],
+            mainAxisAlignment: MainAxisAlignment.spaceAround,
+          ),
         ),
       ),
     );

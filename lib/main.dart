@@ -1,11 +1,20 @@
+import 'dart:io';
+
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+
 import './widgets/transaction_list.dart';
 import './widgets/new_transaction.dart';
 import 'models/transaction.dart';
 import './thememodes.dart';
 import 'widgets/chart.dart';
 
-void main() => runApp(const MyApp());
+void main() {
+  // WidgetsFlutterBinding.ensureInitialized();
+  // SystemChrome.setPreferredOrientations(
+  //     [DeviceOrientation.portraitUp, DeviceOrientation.portraitDown]);
+  runApp(const MyApp());
+}
 
 class MyApp extends StatefulWidget {
   const MyApp({Key? key}) : super(key: key);
@@ -31,7 +40,7 @@ class MyHomePage extends StatefulWidget {
   State<MyHomePage> createState() => _MyHomePageState();
 }
 
-bool isLightMode = false;
+bool isLightMode = true;
 
 class _MyHomePageState extends State<MyHomePage> {
   final List<Transaction> _userTransactions = [];
@@ -48,6 +57,7 @@ class _MyHomePageState extends State<MyHomePage> {
     });
   }
 
+  bool _showChart = false;
   List<Transaction> get _recentTransactions {
     return _userTransactions.where((tx) {
       return tx.date.isAfter(DateTime.now().subtract(const Duration(days: 7)));
@@ -79,41 +89,103 @@ class _MyHomePageState extends State<MyHomePage> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      floatingActionButtonLocation: FloatingActionButtonLocation.centerFloat,
-      floatingActionButton: FloatingActionButton(
-        child: const Icon(Icons.add),
-        onPressed: () => _startAddNewTransaction(context),
-      ),
-      appBar: AppBar(
-        leading: isLightMode
-            ? IconButton(
-                icon: const Icon(Icons.dark_mode),
-                onPressed: _toggleTheme,
-              )
-            : IconButton(
-                icon: const Icon(Icons.light_mode),
-                onPressed: _toggleTheme,
+    final mediaQuery = MediaQuery.of(context);
+    final isLandscape = mediaQuery.orientation == Orientation.landscape;
+    final dynamic appBar = Platform.isIOS
+        ? CupertinoNavigationBar(
+            backgroundColor: Theme.of(context).primaryColor,
+            middle: Text(
+              "Budget Better",
+              style: Theme.of(context).textTheme.headline6,
+            ),
+            trailing: Row(mainAxisSize: MainAxisSize.min, children: [
+              GestureDetector(
+                child: Icon(
+                  CupertinoIcons.add,
+                  color: Theme.of(context).accentColor,
+                ),
+                onTap: () => _startAddNewTransaction(context),
               ),
-        title: const Text(
-          "Budget Better",
-          // style: TextStyle(fontFamily: "OpenSans", fontWeight: FontWeight.bold),
-        ),
-        // foregroundColor: Theme.of(context).accentColor,
-        actions: [
-          IconButton(
-              onPressed: () => _startAddNewTransaction(context),
-              icon: const Icon(Icons.add))
-        ],
-      ),
-      body: Column(
+            ]),
+          )
+        : AppBar(
+            title: Text(
+              "Budget Better",
+              style: Theme.of(context).textTheme.headline6,
+            ),
+            actions: [
+              IconButton(
+                  onPressed: () => _startAddNewTransaction(context),
+                  icon: const Icon(Icons.add))
+            ],
+          );
+
+    final txList = Container(
+      height: (mediaQuery.size.height -
+              appBar.preferredSize.height -
+              mediaQuery.padding.top) *
+          0.7,
+      child: Expanded(
+          child: TransactionList(_userTransactions, _deleteTransaction)),
+    );
+    final pageBody = SafeArea(
+        child: SingleChildScrollView(
+      child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
-          Chart(_recentTransactions),
-          Expanded(
-              child: TransactionList(_userTransactions, _deleteTransaction)),
+          if (isLandscape)
+            Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                Text(
+                  "Show Chart",
+                  style: Theme.of(context).textTheme.headlineSmall,
+                ),
+                Switch.adaptive(
+                    activeColor: Theme.of(context).accentColor,
+                    value: _showChart,
+                    onChanged: (value) {
+                      setState(() {
+                        _showChart = value;
+                      });
+                    }),
+              ],
+            ),
+          if (!isLandscape)
+            Container(
+                height: (mediaQuery.size.height -
+                        appBar.preferredSize.height -
+                        mediaQuery.padding.top) *
+                    0.3,
+                child: Chart(_recentTransactions)),
+          if (!isLandscape) txList,
+          if (isLandscape)
+            _showChart
+                ? Container(
+                    height: (mediaQuery.size.height -
+                            appBar.preferredSize.height -
+                            mediaQuery.padding.top) *
+                        0.7,
+                    child: Chart(_recentTransactions))
+                : txList,
         ],
       ),
-    );
+    ));
+    return Platform.isIOS
+        ? CupertinoPageScaffold(
+            child: pageBody,
+            navigationBar: appBar,
+          )
+        : Scaffold(
+            floatingActionButtonLocation:
+                FloatingActionButtonLocation.centerFloat,
+            floatingActionButton: Platform.isIOS
+                ? Container()
+                : FloatingActionButton(
+                    child: const Icon(Icons.add),
+                    onPressed: () => _startAddNewTransaction(context),
+                  ),
+            appBar: appBar,
+            body: pageBody);
   }
 }

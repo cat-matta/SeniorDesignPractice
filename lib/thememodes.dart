@@ -40,12 +40,12 @@ class ThemeModes {
               fontSize: 20,
             ),
           ),
-      appBarTheme: AppBarTheme(
-        titleTextStyle: TextStyle(
-          fontFamily: "OpenSans",
-          fontWeight: FontWeight.bold,
-          fontSize: 20,
-        ),
+      appBarTheme: const AppBarTheme(
+        titleTextStyle: const TextStyle(
+            fontFamily: "OpenSans",
+            fontWeight: FontWeight.bold,
+            fontSize: 20,
+            color: Colors.white),
       ),
     );
   }
